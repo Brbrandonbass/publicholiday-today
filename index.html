@@ -327,9 +327,35 @@ const COUNTRIES=[
   {c:"SV",n:"El Salvador",f:"🇸🇻"},{c:"TN",n:"Tunisia",f:"🇹🇳"},{c:"TR",n:"Turkey",f:"🇹🇷"},
   {c:"TT",n:"Trinidad & Tobago",f:"🇹🇹"},{c:"UA",n:"Ukraine",f:"🇺🇦"},{c:"US",n:"United States",f:"🇺🇸"},
   {c:"UY",n:"Uruguay",f:"🇺🇾"},{c:"VE",n:"Venezuela",f:"🇻🇪"},{c:"VN",n:"Vietnam",f:"🇻🇳"},
-  {c:"ZA",n:"South Africa",f:"🇿🇦"},{c:"ZW",n:"Zimbabwe",f:"🇿🇼"},
+  {c:"ZA",n:"South Africa",f:"🇿🇦"},{c:"ZM",n:"Zambia",f:"🇿🇲"},{c:"ZW",n:"Zimbabwe",f:"🇿🇼"},
 ];
-const POPULAR=["US","GB","AU","CA","DE","FR","JP","IN","BR","MX","ES","IT","NL","NZ","SG","ZA","KR","IE","PH","MY"];
+
+// ── Hardcoded holidays for countries not in Nager.Date ────────────
+const CUSTOM_HOLIDAYS={
+  ZM:[
+    {date:"{Y}-01-01",name:"New Year's Day",localName:"New Year's Day"},
+    {date:"{Y}-03-08",name:"Women's Day",localName:"International Women's Day"},
+    {date:"{Y}-03-12",name:"Youth Day",localName:"Youth Day"},
+    {date:"{Y}-04-18",name:"Good Friday",localName:"Good Friday"},
+    {date:"{Y}-04-21",name:"Easter Monday",localName:"Easter Monday"},
+    {date:"{Y}-05-01",name:"Labour Day",localName:"Labour Day"},
+    {date:"{Y}-05-25",name:"Africa Freedom Day",localName:"Africa Freedom Day"},
+    {date:"{Y}-07-07",name:"Heroes Day",localName:"Heroes Day"},
+    {date:"{Y}-07-08",name:"Unity Day",localName:"Unity Day"},
+    {date:"{Y}-08-04",name:"Farmers Day",localName:"Farmers Day"},
+    {date:"{Y}-10-18",name:"National Prayer Day",localName:"National Day of Prayer"},
+    {date:"{Y}-10-24",name:"Independence Day",localName:"Independence Day"},
+    {date:"{Y}-12-25",name:"Christmas Day",localName:"Christmas Day"},
+    {date:"{Y}-12-26",name:"Boxing Day",localName:"Boxing Day"},
+  ]
+};
+function getCustomHolidays(code){
+  const year=new Date().getFullYear();
+  const list=CUSTOM_HOLIDAYS[code];
+  if(!list)return null;
+  return list.map(h=>({...h,date:h.date.replace('{Y}',String(year))}));
+}
+const POPULAR=["US","GB","AU","CA","DE","FR","JP","IN","BR","MX","ES","IT","NL","NZ","SG","ZA","ZM","KR","IE","PH","MY"];
 let currentCountry=null;
 
 // ── Boot ─────────────────────────────────────────────────────────
@@ -416,6 +442,10 @@ function setMeta(id,val,attr='content'){const el=document.getElementById(id);if(
 
 // ── API ───────────────────────────────────────────────────────────
 async function loadHolidays(code){
+  // Check for custom hardcoded data first
+  const custom=getCustomHolidays(code);
+  if(custom){renderAnswer(custom);renderUpcoming(custom);return;}
+  // Otherwise use Nager.Date API
   const year=new Date().getFullYear();
   try{
     const r=await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/${code}`,{signal:AbortSignal.timeout(7000)});
