@@ -3,6 +3,7 @@
     { "source": "/about", "destination": "/about.html" },
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/api", "destination": "/holiday-api.html" },
+    { "source": "/leave", "destination": "/leave.html" },
     { "source": "/sitemap.xml", "destination": "/sitemap.xml" },
     { "source": "/ads.txt", "destination": "/ads.txt" },
     { "source": "/(.*)", "destination": "/index.html" }
