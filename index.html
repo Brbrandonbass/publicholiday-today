@@ -186,6 +186,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:24
 <nav>
   <a class="nav-logo" href="/">publicholiday.today</a>
   <div class="nav-links">
+    <a class="nav-link" href="/leave">🗓️ Leave Planner</a>
     <a class="nav-link" href="/about">About</a>
     <a class="nav-link cta" href="/api">API for Devs →</a>
   </div>
@@ -230,6 +231,17 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:24
   <!-- Upcoming -->
   <div class="section-label">Upcoming in <span id="countryShort">your country</span></div>
   <div class="upcoming-list" id="upcomingList"></div>
+
+  <!-- Leave planner promo -->
+  <a href="/leave" style="width:100%;text-decoration:none;">
+    <div style="background:linear-gradient(135deg,#1a6b3a,#2d9e58);border-radius:20px;padding:22px 24px;display:flex;align-items:center;gap:16px;box-shadow:0 4px 20px rgba(26,107,58,.25);transition:transform .2s;cursor:pointer;" onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='none'">
+      <div style="font-size:36px;flex-shrink:0;">🗓️</div>
+      <div style="flex:1;">
+        <div style="font-family:'Playfair Display',serif;font-size:17px;font-weight:700;color:#fff;margin-bottom:3px;">Maximise your time off</div>
+        <div style="font-size:12px;color:rgba(255,255,255,.75);font-weight:300;line-height:1.4;">See exactly which days to take off to get the longest breaks this year. Free leave optimiser →</div>
+      </div>
+    </div>
+  </a>
 
   <!-- Ad -->
   <div class="ad-wrapper">
