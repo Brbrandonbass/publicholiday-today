@@ -207,6 +207,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:24
   <a class="nav-logo" href="/">publicholiday.today</a>
   <div class="nav-links">
     <a class="nav-link" href="/leave">🗓️ Leave Planner</a>
+    <a class="nav-link" href="/countries">Country Guides</a>
     <a class="nav-link" href="/about">About</a>
     <a class="nav-link cta" href="/api">API for Devs →</a>
   </div>
@@ -421,6 +422,8 @@ function getCustomHolidays(code){
   return null;
 }
 const POPULAR=["US","GB","AU","CA","DE","FR","JP","IN","BR","MX","ES","IT","NL","NZ","SG","ZA","ZM","KR","IE","PH","MY"];
+// Countries with a full static guide page at /holidays/[code]
+const GUIDE_COUNTRIES=["US","GB","AU","CA","DE","FR","JP","BR","MX","ES","IT","NL","NZ","SG","ZA","IE","PH","KR","CH","BE"];
 let currentCountry=null;
 let currentHolidays=[];
 let currentYear=new Date().getFullYear();
@@ -615,13 +618,12 @@ function renderUpcoming(holidays){
 // ── Country grid & footer ─────────────────────────────────────────
 function buildCountryGrid(){
   const grid=document.getElementById('countryGridLinks');
-  POPULAR.slice(0,16).forEach(code=>{
+  GUIDE_COUNTRIES.forEach(code=>{
     const c=COUNTRIES.find(x=>x.c===code);if(!c)return;
     const a=document.createElement('a');
     a.className='country-grid-link';
-    a.href='/'+c.c;
+    a.href='/holidays/'+c.c;
     a.innerHTML=`<span>${c.f}</span>${c.n}`;
-    a.onclick=(e)=>{e.preventDefault();setCountry(c,true);window.scrollTo({top:0,behavior:'smooth'});};
     grid.appendChild(a);
   });
 }

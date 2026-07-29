@@ -48,6 +48,7 @@ nav{position:relative;z-index:10;display:flex;align-items:center;justify-content
 .check-cta-inner span.emoji{font-size:32px;flex-shrink:0;}
 .check-cta-title{font-family:'Playfair Display',serif;font-size:16px;font-weight:700;color:#fff;margin-bottom:2px;}
 .check-cta-sub{font-size:12px;color:rgba(255,255,255,.8);font-weight:300;}
+.top-cta .check-cta-inner{background:linear-gradient(135deg,var(--accent),#e8956d);box-shadow:0 4px 20px rgba(212,82,42,.25);}
 .section-label{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);font-weight:500;align-self:flex-start;padding-left:4px;}
 .hd-cards{width:100%;display:flex;flex-direction:column;gap:8px;}
 .hd-card{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 18px;}
@@ -83,14 +84,25 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:24
   <div class="nav-links">
     <a class="nav-link" href="/leave">🗓️ Leave Planner</a>
     <a class="nav-link" href="/calculate">📆 Business Days</a>
+    <a class="nav-link" href="/countries">Country Guides</a>
     <a class="nav-link cta" href="/api">API for Devs →</a>
   </div>
 </nav>
 <div class="page">
-  <div class="breadcrumb"><a href="/">Home</a> <span>›</span> <a href="/holidays">Holidays</a> <span>›</span> <span>New Zealand</span></div>
+  <div class="breadcrumb"><a href="/">Home</a> <span>›</span> <a href="/countries">Country Guides</a> <span>›</span> <span>New Zealand</span></div>
   <span class="hero-flag">🇳🇿</span>
   <h1 class="hero-title">Public Holidays in New Zealand <em style="font-style:italic;color:var(--accent)">2026</em></h1>
   <p class="hero-sub">23 public and regional holidays observed across New Zealand in 2026.</p>
+
+  <a class="check-cta top-cta" href="/">
+    <div class="check-cta-inner">
+      <span class="emoji">👉</span>
+      <div>
+        <div class="check-cta-title">Check if today is a holiday →</div>
+        <div class="check-cta-sub">Jump to the live holiday checker for any country</div>
+      </div>
+    </div>
+  </a>
 
   <div class="seo-block">
     <p>New Zealand observes eleven nationwide public holidays, including the culturally significant Waitangi Day and Matariki — the Māori New Year, added as an official public holiday in 2022. On top of the national list, every region also celebrates its own "provincial anniversary day" commemorating its founding, meaning the actual number of public holidays a Kiwi gets depends on which province they live in. Below is the complete 2026 calendar, covering both national and regional anniversary holidays.</p>

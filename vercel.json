@@ -5,6 +5,7 @@
     { "source": "/api", "destination": "/holiday-api.html" },
     { "source": "/leave", "destination": "/leave.html" },
     { "source": "/calculate", "destination": "/calculate.html" },
+    { "source": "/countries", "destination": "/countries.html" },
     { "source": "/holidays/:code", "destination": "/holidays/:code.html" },
     { "source": "/sitemap.xml", "destination": "/sitemap.xml" },
     { "source": "/ads.txt", "destination": "/ads.txt" },
