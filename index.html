@@ -112,6 +112,11 @@ nav{position:relative;z-index:10;display:flex;align-items:center;justify-content
 .share-btn:hover{border-color:var(--ink);background:var(--bg);}
 .share-btn.copied{background:var(--yes-bg);border-color:#b8dfc5;color:var(--yes);}
 
+/* iCal button */
+.ical-btn{width:100%;display:flex;flex-direction:column;align-items:center;gap:2px;font-family:'Outfit',sans-serif;font-size:14px;font-weight:500;color:var(--ink);background:var(--surface);border:1px solid var(--border);border-radius:100px;padding:12px 20px;cursor:pointer;transition:all .2s;}
+.ical-btn:hover{border-color:var(--ink);background:var(--bg);}
+.ical-btn-sub{font-size:10px;font-weight:300;color:var(--muted);}
+
 /* Section label */
 .section-label{font-size:10px;letter-spacing:2.5px;text-transform:uppercase;color:var(--muted);font-weight:500;align-self:flex-start;padding-left:4px;}
 
@@ -141,6 +146,21 @@ nav{position:relative;z-index:10;display:flex;align-items:center;justify-content
 .seo-block h2{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;color:var(--ink);margin-bottom:10px;}
 .seo-block p{margin-bottom:8px;}
 .seo-block p:last-child{margin:0;}
+
+/* Email alerts */
+.alert-card{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:26px 24px;text-align:center;box-shadow:var(--sh);}
+.alert-icon{font-size:32px;margin-bottom:6px;}
+.alert-title{font-family:'Playfair Display',serif;font-size:18px;font-weight:700;margin-bottom:4px;}
+.alert-sub{font-size:12px;color:var(--muted);margin-bottom:16px;line-height:1.5;max-width:360px;margin-left:auto;margin-right:auto;}
+.alert-form{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;}
+.alert-input{flex:1;min-width:180px;background:var(--bg);border:1px solid var(--border);border-radius:100px;padding:10px 16px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink);outline:none;transition:border-color .2s;}
+.alert-input:focus{border-color:var(--ink);}
+.alert-select{background:var(--bg);border:1px solid var(--border);border-radius:100px;padding:10px 14px;font-family:'Outfit',sans-serif;font-size:13px;color:var(--ink);outline:none;max-width:160px;}
+.alert-submit{background:var(--ink);color:#fff;border:none;border-radius:100px;padding:10px 20px;font-family:'Outfit',sans-serif;font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap;transition:opacity .2s;}
+.alert-submit:hover{opacity:.85;}
+.alert-submit:disabled{opacity:.5;cursor:default;}
+.alert-note{font-size:10px;color:var(--muted);margin-top:12px;}
+.alert-success{font-size:13px;color:var(--yes);font-weight:400;line-height:1.6;max-width:360px;margin:0 auto;}
 
 /* Ad */
 .ad-wrapper{width:100%;border:1px dashed var(--border);border-radius:14px;padding:14px 16px;text-align:center;}
@@ -231,6 +251,7 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:24
   <!-- Upcoming -->
   <div class="section-label">Upcoming in <span id="countryShort">your country</span></div>
   <div class="upcoming-list" id="upcomingList"></div>
+  <button class="ical-btn" onclick="downloadICS()">📅 Add to Calendar <span class="ical-btn-sub">.ics for Google, Apple &amp; Outlook</span></button>
 
   <!-- Leave planner promo -->
   <a href="/leave" style="width:100%;text-decoration:none;">
@@ -242,6 +263,19 @@ footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:24
       </div>
     </div>
   </a>
+
+  <!-- Email holiday alerts -->
+  <div class="alert-card" id="alertCard">
+    <div class="alert-icon">🔔</div>
+    <div class="alert-title">Never miss a holiday</div>
+    <div class="alert-sub">Get a free email reminder 3 days before every public holiday in your country.</div>
+    <form class="alert-form" id="alertForm" onsubmit="submitAlert(event)">
+      <input type="email" class="alert-input" id="alertEmail" placeholder="you@email.com" required autocomplete="email">
+      <select class="alert-select" id="alertCountry" required></select>
+      <button type="submit" class="alert-submit" id="alertSubmitBtn">Notify Me</button>
+    </form>
+    <div class="alert-note" id="alertNote">No spam. Unsubscribe anytime.</div>
+  </div>
 
   <!-- Ad -->
   <div class="ad-wrapper">
@@ -388,6 +422,8 @@ function getCustomHolidays(code){
 }
 const POPULAR=["US","GB","AU","CA","DE","FR","JP","IN","BR","MX","ES","IT","NL","NZ","SG","ZA","ZM","KR","IE","PH","MY"];
 let currentCountry=null;
+let currentHolidays=[];
+let currentYear=new Date().getFullYear();
 
 // ── Boot ─────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded',()=>{
@@ -396,6 +432,7 @@ window.addEventListener('DOMContentLoaded',()=>{
   buildCountryList();
   buildCountryGrid();
   buildFooterLinks();
+  populateAlertCountries();
   // Check URL for country code: /US or /GB etc.
   const path=window.location.pathname.replace('/','').toUpperCase();
   const fromUrl=COUNTRIES.find(x=>x.c===path);
@@ -428,6 +465,7 @@ function setCountry(c,updateUrl){
   document.getElementById('locName').textContent=c.n;
   document.getElementById('countryShort').textContent=c.n;
   document.querySelectorAll('.country-option').forEach(el=>el.classList.toggle('selected',el.dataset.code===c.c));
+  const alertSel=document.getElementById('alertCountry');if(alertSel)alertSel.value=c.c;
   // Dynamic SEO
   updateSEO(c);
   showLoading();
@@ -473,18 +511,61 @@ function setMeta(id,val,attr='content'){const el=document.getElementById(id);if(
 
 // ── API ───────────────────────────────────────────────────────────
 async function loadHolidays(code){
+  currentYear=new Date().getFullYear();
   // Check for custom hardcoded data first
   const custom=getCustomHolidays(code);
-  if(custom){renderAnswer(custom);renderUpcoming(custom);return;}
+  if(custom){currentHolidays=custom;renderAnswer(custom);renderUpcoming(custom);return;}
   // Otherwise use Nager.Date API
-  const year=new Date().getFullYear();
   try{
-    const r=await fetch(`https://date.nager.at/api/v3/PublicHolidays/${year}/${code}`,{signal:AbortSignal.timeout(7000)});
+    const r=await fetch(`https://date.nager.at/api/v3/PublicHolidays/${currentYear}/${code}`,{signal:AbortSignal.timeout(7000)});
     if(!r.ok)throw new Error();
     const data=await r.json();
+    currentHolidays=data;
     renderAnswer(data);
     renderUpcoming(data);
-  }catch(e){showError();}
+  }catch(e){currentHolidays=[];showError();}
+}
+
+// ── iCal export ───────────────────────────────────────────────────
+function downloadICS(){
+  if(!currentHolidays.length||!currentCountry){
+    alert('Holiday data is still loading — try again in a moment.');
+    return;
+  }
+  const pad=n=>String(n).padStart(2,'0');
+  const toICSDate=d=>d.replace(/-/g,'');
+  const nextDay=dateStr=>{
+    const d=new Date(dateStr+'T12:00:00');
+    d.setDate(d.getDate()+1);
+    return `${d.getFullYear()}${pad(d.getMonth()+1)}${pad(d.getDate())}`;
+  };
+  const now=new Date();
+  const stamp=`${now.getUTCFullYear()}${pad(now.getUTCMonth()+1)}${pad(now.getUTCDate())}T${pad(now.getUTCHours())}${pad(now.getUTCMinutes())}${pad(now.getUTCSeconds())}Z`;
+  const escapeText=s=>String(s).replace(/[\\,;]/g,m=>'\\'+m).replace(/\r?\n/g,'\\n');
+
+  let ics='BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//publicholiday.today//Public Holidays//EN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\n';
+  currentHolidays.forEach((h,i)=>{
+    ics+='BEGIN:VEVENT\r\n';
+    ics+=`UID:${h.date}-${currentCountry.c}-${i}@publicholiday.today\r\n`;
+    ics+=`DTSTAMP:${stamp}\r\n`;
+    ics+=`DTSTART;VALUE=DATE:${toICSDate(h.date)}\r\n`;
+    ics+=`DTEND;VALUE=DATE:${nextDay(h.date)}\r\n`;
+    ics+=`SUMMARY:${escapeText(h.localName||h.name)}\r\n`;
+    ics+=`DESCRIPTION:${escapeText('Public holiday in '+currentCountry.n+' — via publicholiday.today')}\r\n`;
+    ics+='TRANSP:TRANSPARENT\r\n';
+    ics+='END:VEVENT\r\n';
+  });
+  ics+='END:VCALENDAR\r\n';
+
+  const blob=new Blob([ics],{type:'text/calendar;charset=utf-8'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;
+  a.download=`publicholidays-${currentCountry.c}-${currentYear}.ics`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 
 // ── Render answer ─────────────────────────────────────────────────
@@ -577,6 +658,60 @@ function filterCountries(){
 function openModal(){document.getElementById('modal').classList.add('open');setTimeout(()=>document.getElementById('searchInput').focus(),300);}
 function closeModal(){document.getElementById('modal').classList.remove('open');document.getElementById('searchInput').value='';filterCountries();}
 function handleOverlay(e){if(e.target===document.getElementById('modal'))closeModal();}
+
+// ── Email holiday alerts ─────────────────────────────────────────
+// Deploy the Google Apps Script in /apps-script/holiday-alerts.gs as a Web App
+// (Deploy → New deployment → Web app → Execute as me → Who has access: Anyone),
+// then paste the resulting /exec URL below.
+const EMAIL_WEBHOOK_URL = "REPLACE_WITH_YOUR_GOOGLE_APPS_SCRIPT_WEB_APP_URL";
+
+function populateAlertCountries(){
+  const sel=document.getElementById('alertCountry');
+  if(!sel)return;
+  sel.innerHTML='';
+  COUNTRIES.forEach(c=>{
+    const opt=document.createElement('option');
+    opt.value=c.c;opt.textContent=`${c.f} ${c.n}`;
+    sel.appendChild(opt);
+  });
+  if(currentCountry)sel.value=currentCountry.c;
+}
+
+async function submitAlert(e){
+  e.preventDefault();
+  const emailEl=document.getElementById('alertEmail');
+  const email=emailEl.value.trim();
+  const country=document.getElementById('alertCountry').value;
+  const btn=document.getElementById('alertSubmitBtn');
+  const note=document.getElementById('alertNote');
+  if(!email||!country)return;
+
+  if(EMAIL_WEBHOOK_URL.startsWith('REPLACE_WITH')){
+    note.innerHTML='<span style="color:var(--no)">⚠️ Alerts aren\'t set up yet — check back soon!</span>';
+    return;
+  }
+
+  btn.disabled=true;btn.textContent='Submitting…';
+  note.textContent='';
+  try{
+    // Apps Script web apps don't return CORS headers, so we fire the request
+    // in no-cors mode and treat a non-throwing request as a successful submit.
+    await fetch(EMAIL_WEBHOOK_URL,{
+      method:'POST',
+      mode:'no-cors',
+      headers:{'Content-Type':'text/plain;charset=utf-8'},
+      body:JSON.stringify({email,country,timestamp:new Date().toISOString()})
+    });
+    const cName=(COUNTRIES.find(x=>x.c===country)||{}).n||country;
+    document.getElementById('alertCard').innerHTML=`
+      <div class="alert-icon">✅</div>
+      <div class="alert-title">You're on the list!</div>
+      <div class="alert-success">We'll email <strong>${email}</strong> 3 days before every public holiday in ${cName}.</div>`;
+  }catch(err){
+    btn.disabled=false;btn.textContent='Notify Me';
+    note.innerHTML='<span style="color:var(--no)">Something went wrong — please try again.</span>';
+  }
+}
 
 // ── Share ─────────────────────────────────────────────────────────
 function copyLink(btn){

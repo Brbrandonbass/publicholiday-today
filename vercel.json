@@ -4,6 +4,8 @@
     { "source": "/privacy", "destination": "/privacy.html" },
     { "source": "/api", "destination": "/holiday-api.html" },
     { "source": "/leave", "destination": "/leave.html" },
+    { "source": "/calculate", "destination": "/calculate.html" },
+    { "source": "/holidays/:code", "destination": "/holidays/:code.html" },
     { "source": "/sitemap.xml", "destination": "/sitemap.xml" },
     { "source": "/ads.txt", "destination": "/ads.txt" },
     { "source": "/(.*)", "destination": "/index.html" }
